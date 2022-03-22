@@ -1,0 +1,24 @@
+{
+	"name": "EmploymentData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AmazonS31",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AmazonS3Location",
+				"bucketName": "myawsbucketud",
+				"folderPath": "testFolder/nestedTestFolder",
+				"fileName": "Current_Employee_Names__Salaries__and_Position_Titles.csv"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
