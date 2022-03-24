@@ -12,13 +12,33 @@
 					"name": "ChicagoEmployeeData"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AnalyzedEmployeeData",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "SplitPoliceDepartmentData"
 				},
 				{
-					"name": "TotalSalaryByDepartment"
+					"name": "TotalSalaryPoliceDept"
+				},
+				{
+					"name": "SumByDepartmentStatusType"
+				},
+				{
+					"name": "sortOutput"
+				},
+				{
+					"name": "Union"
+				},
+				{
+					"name": "JoinSource"
 				}
 			],
 			"scriptLines": [
@@ -42,7 +62,25 @@
 				"          Column_4,",
 				"          Column_5),",
 				"     SumOfEMPByDeptStatusType = sum(toInteger(Column_7)),",
-				"     partitionBy('hash', 1)) ~> TotalSalaryByDepartment"
+				"     partitionBy('hash', 1)) ~> TotalSalaryPoliceDept",
+				"SplitPoliceDepartmentData@RestOfTheDepartments aggregate(groupBy(Column_3,",
+				"          Column_4,",
+				"          Column_5),",
+				"     SumByDepartmentStatusType = sum(toInteger(Column_7))) ~> SumByDepartmentStatusType",
+				"SumByDepartmentStatusType sort(asc(Column_3, true),",
+				"     asc(Column_4, true),",
+				"     asc(Column_5, true),",
+				"     partitionBy('hash', 1)) ~> sortOutput",
+				"sortOutput, TotalSalaryPoliceDept union(byName: false)~> Union",
+				"ChicagoEmployeeData, Union join(Union@Column_3 == ChicagoEmployeeData@Column_3",
+				"     && Union@Column_4 == ChicagoEmployeeData@Column_4",
+				"     && Union@Column_5 == ChicagoEmployeeData@Column_5,",
+				"     joinType:'left',",
+				"     broadcast: 'auto')~> JoinSource",
+				"JoinSource sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
