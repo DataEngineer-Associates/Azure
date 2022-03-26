@@ -1,0 +1,20 @@
+{
+	"name": "powerquery1",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "ChicagoEmployeeData",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~>  ChicagoEmployeeData",
+					"dataset": {
+						"referenceName": "ChicagoEmployeeData",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared ChicagoEmployeeData = let AdfDoc = AzureStorage.BlobContents(\"https://myfirststorageaccountud.blob.core.windows.net/myfirststoragecontainer/Current_Employee_Names__Salaries__and_Position_Titles.txt\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]) in Csv;\r\nshared UserQuery = let Source = #\"ChicagoEmployeeData\" in Source;\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}
